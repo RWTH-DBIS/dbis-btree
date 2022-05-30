@@ -1,11 +1,3 @@
-#import sys
-#import os
-# to import from parent folder
-## sets current folder to parent folder
-#current = os.path.dirname(os.path.realpath(__file__))
-#parent = os.path.dirname(current)
-#sys.path.append(parent)
-
 from .BBaum import BTree
 import numpy as np
 from enum import Enum
