@@ -7,6 +7,7 @@ In der Vorlesung haben Sie B-Bäume kennengelernt.
 Dieses Blatt gibt einen kurzen Überblick über ein von uns entwickeltes Python-Tool.\
 Im DBIS Image des Jupyter Hub der RWTH ist dieses Package bereits integriert, falls Sie das Tool lokal benutzen möchten, können Sie diese über den folgenden Befehl installieren:
 ```python_pip install dbis-btree
+pip install dbis-btree
 # in jupyter notebooks:
 !pip install dbis-btree
 ```
