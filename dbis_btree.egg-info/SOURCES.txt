@@ -1,0 +1,8 @@
+MANIFEST.in
+README.md
+setup.py
+dbis_btree.egg-info/PKG-INFO
+dbis_btree.egg-info/SOURCES.txt
+dbis_btree.egg-info/dependency_links.txt
+dbis_btree.egg-info/requires.txt
+dbis_btree.egg-info/top_level.txt

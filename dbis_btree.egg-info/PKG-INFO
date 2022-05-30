@@ -1,0 +1,34 @@
+Metadata-Version: 2.1
+Name: dbis-btree
+Version: 0.1.0
+Summary: RWTH Aachen Computer Science i5/dbis assets for Lecture Datenbanken und Informationssysteme
+Home-page: https://git.rwth-aachen.de/i5/teaching/dbis-btree.git
+Author: Lars Leimbach
+License: Apache
+Description: ![DBIS Informatik 5 - Informationssysteme und Datenbank](https://dbis.rwth-aachen.de/dbis/wp-content/uploads/2022/04/dbis-logo.png)
+        
+        
+        
+        # Dokumentation zur Nutzung des B-Baum
+        In der Vorlesung haben Sie B-Bäume kennengelernt.
+        Dieses Blatt gibt einen kurzen Überblick über ein von uns entwickeltes Python-Tool.\
+        Im DBIS Image des Jupyter Hub der RWTH ist dieses Package bereits integriert, falls Sie das Tool lokal benutzen möchten, können Sie diese über den folgenden Befehl installieren:
+        ```python
+        !pip install dbis-btree
+        print("currently not implemented")
+        ```
+        Die folgende Zelle importiert das Python Modul und ermöglicht dessen Nutzung innerhalb des Notebooks:
+        ```python
+        from dbis-btree.BBaum import BTree
+        ```
+        
+        ## B-Baum als Objekt
+        
+        Als erstes müssen Sie eine neue Instanz der Klasse `BTree` erzeugen. Diesem Objekt werden im weiteren Verlauf Knoten `nodes` und Kanten `edges` hinzugefügt.
+        Geben Sie die `M`-Value für den B-Baum an.
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Description-Content-Type: text/markdown
