@@ -1,14 +1,28 @@
-image: python:3.7
+image: python:latest
 
-stages: 
+stages:
     - test
     - build
 
-unit-test:
+unit-test-3.11:
+    image: python:3.11
     stage: test
     script:
-        - pip install -r assets/requirements.txt
-        - python -m unittest
+        - pip install tox
+        - tox -r -e py311
+
+unit-test-3.10:
+    image: python:3.10
+    stage: test
+    script:
+        - pip install tox
+        - tox -r -e py310
+
+formatting-check:
+    stage: test
+    script:
+      - pip install black
+      - black --check .
 
 build-and-publish:
     stage: build
@@ -18,9 +32,9 @@ build-and-publish:
         - pip install build twine
         - python -m build
         - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
-  
+
     rules:
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-          changes: 
+          changes:
               - setup.py
         - if: $CI_PIPELINE_SOURCE == "tags"

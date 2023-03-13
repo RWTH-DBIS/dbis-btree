@@ -1,0 +1,29 @@
+[project]
+name = "dbis-bbaum"
+version = "0.0.2"
+description = "RWTH Aachen Computer Science i5/dbis assets for Lecture Datenbanken und Informationssysteme"
+authors = [
+	{ name = "Lars Leimbach", email = "hochmann@dbis.rwth-aachen.de" },
+]
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+]
+dependencies = [
+	"numpy",
+	"graphviz",
+	"ipython",
+]
+
+[project.urls]
+"Homepage" = "https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree"
+
+[options]
+packages = ["dbis_btree"]
+include_package_data = true
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
