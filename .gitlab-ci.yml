@@ -37,5 +37,5 @@ build-3.10:
     rules:
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
           changes:
-              - setup.py
+              - pyproject.toml
         - if: $CI_PIPELINE_SOURCE == "tags"
