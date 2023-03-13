@@ -24,10 +24,11 @@ formatting-check:
       - pip install black
       - black --check .
 
-build-and-publish:
+build-3.10:
+    image: python:3.10
     stage: build
     needs:
-        - unit-test
+        - unit-test-3.10
     script:
         - pip install build twine
         - python -m build
