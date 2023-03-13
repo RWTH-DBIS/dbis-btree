@@ -2,6 +2,7 @@ from .BBaum import BTree
 import numpy as np
 from enum import Enum
 
+
 class TreeTypes(Enum):
     INSERT = "INSERT"
     INSERT_TRIVIAL = "INSERT_TRIVIAL"
@@ -9,9 +10,9 @@ class TreeTypes(Enum):
     DELETE_AUSGLEICH = "DELETE_AUSGLEICH"
     DELETE_TRIVIAL = "DELETE_TRIVIAL"
 
+
 class BTree_Creator:
-    def __init__(self, height, maxValueInTree,
-                 valuesCountInOneNode, treeType):
+    def __init__(self, height, maxValueInTree, valuesCountInOneNode, treeType):
         self.height = height
         # values from 0 to maxValueInTree
         self.maxValueInTree = maxValueInTree
@@ -26,7 +27,6 @@ class BTree_Creator:
         # to ensure that not only NOT trival inserting or deleting exist
         #  counts how many leaf nodes will be skiped
 
-
         # just for safetiness check if tree is 100% correct
         treeIncorrect = True
         while self.maxInterationsCorrection > 0 and treeIncorrect:
@@ -37,10 +37,12 @@ class BTree_Creator:
             self.buildTree([(0, None, 0, maxValueInTree, 0)])
             print("done.")
             print("checking if tree is correct...")
-            rootNode = next((x for x in self.myBBaum.nodeArray
-                             if x.previousNode == None), None)
-            treeIncorrect = BTree_Creator\
-                            .treeIncorrect(self.myBBaum, rootNode,self.valuesCountInOneNode)
+            rootNode = next(
+                (x for x in self.myBBaum.nodeArray if x.previousNode == None), None
+            )
+            treeIncorrect = BTree_Creator.treeIncorrect(
+                self.myBBaum, rootNode, self.valuesCountInOneNode
+            )
             if not treeIncorrect:
                 print("done.")
             else:
@@ -48,25 +50,22 @@ class BTree_Creator:
             self.maxInterationsCorrection -= 1
         assert self.maxInterationsCorrection > 0, "Please restart program."
 
-
     # which note should be the note for non-trivial deleting and inserting
     def determineLeafForOperations(self):
         randomIndex = 0
         if self.valuesCountInOneNode > 1:
-            randomIndex = int(np.random
-                          .random_integers(low=0,
-                                           high=self.valuesCountInOneNode-1))
+            randomIndex = int(
+                np.random.random_integers(low=0, high=self.valuesCountInOneNode - 1)
+            )
         return randomIndex
-
-
 
     # ---------------- check if tree is correct ----------------
     @staticmethod
-    def treeIncorrect(bbaum,parentNode,valuesCountInOneNode):
+    def treeIncorrect(bbaum, parentNode, valuesCountInOneNode):
         if parentNode.nextNodes == [None] * (valuesCountInOneNode + 1):
             return False
         elif parentNode.nextNodes.count(None) != 0:
-            #"Tree has to be full! every inner node has to have a child"
+            # "Tree has to be full! every inner node has to have a child"
             return True
         # one of the children is not None
         isIncorrect = False
@@ -78,24 +77,36 @@ class BTree_Creator:
                     if child.values[-1] >= parentNode.values[i]:
                         # last is bigger -> btree property hurted
                         print("Tree is incorrect.")
-                        print("at nodeNumber:", i, "parentValues:",
-                              parentNode.values, "childValues:",
-                              child.values)
+                        print(
+                            "at nodeNumber:",
+                            i,
+                            "parentValues:",
+                            parentNode.values,
+                            "childValues:",
+                            child.values,
+                        )
                         return True
                     else:
-                        return isIncorrect or BTree_Creator.treeIncorrect(bbaum,child,valuesCountInOneNode)
+                        return isIncorrect or BTree_Creator.treeIncorrect(
+                            bbaum, child, valuesCountInOneNode
+                        )
             else:
                 # now check if its bigger...
                 if child != None:
                     if child.values[0] < parentNode.values[i - 1]:
                         # last is smaller -> btree property hurted
                         print("Tree is incorrect.")
-                        print("at nodeNumber:", i, "parentValues:",
-                              parentNode.values, "childValues:",
-                              child.values)
+                        print(
+                            "at nodeNumber:",
+                            i,
+                            "parentValues:",
+                            parentNode.values,
+                            "childValues:",
+                            child.values,
+                        )
                         return True
                     else:
-                        return isIncorrect or BTree_Creator.treeIncorrect(bbaum,child)
+                        return isIncorrect or BTree_Creator.treeIncorrect(bbaum, child)
 
         return isIncorrect
 
@@ -105,14 +116,18 @@ class BTree_Creator:
     # nodename is a number
     # parentNode for connecting
     def buildTree(self, stackForRecursion):
-
         # here is somehow a bug maybe not everything get loaded
         # if stack is NOT empty
         if len(stackForRecursion) == 0:
             return
 
-        (nodeName, parentNode, minValue, maxValue,
-         currentHeight) = stackForRecursion.pop(0)
+        (
+            nodeName,
+            parentNode,
+            minValue,
+            maxValue,
+            currentHeight,
+        ) = stackForRecursion.pop(0)
 
         if currentHeight > self.height:
             return
@@ -122,8 +137,7 @@ class BTree_Creator:
         if parentNode != None:
             isLeftChild = maxValue <= parentNode
 
-        values = self.createValueArray(minValue, maxValue,
-                                       isLeftChild, currentHeight)
+        values = self.createValueArray(minValue, maxValue, isLeftChild, currentHeight)
 
         if values == None:
             return
@@ -132,15 +146,17 @@ class BTree_Creator:
         self.myBBaum.add_node(BTree_Creator.getNodeName(nodeName), values)
 
         if parentNode != None:
-            thisNodeIsChildNumber = (nodeName % (self.valuesCountInOneNode + 1))
+            thisNodeIsChildNumber = nodeName % (self.valuesCountInOneNode + 1)
             if thisNodeIsChildNumber == 0:
                 thisNodeIsChildNumber = self.valuesCountInOneNode + 1
             # print("add edge from:",parentNode, "to", nodeName,
             #       "N:",thisNodeIsChildNumber)
 
-            self.myBBaum.add_edge(BTree_Creator.getNodeName(parentNode),
-                                  BTree_Creator.getNodeName(nodeName),
-                                  thisNodeIsChildNumber)
+            self.myBBaum.add_edge(
+                BTree_Creator.getNodeName(parentNode),
+                BTree_Creator.getNodeName(nodeName),
+                thisNodeIsChildNumber,
+            )
 
         # :) calculate the nodeposition in btree
         nextNodeName = nodeName * (self.valuesCountInOneNode + 1)
@@ -154,9 +170,13 @@ class BTree_Creator:
             nextIntervallBorder = borders[i]
             nextNodeName += 1
             # print("added next node:",nextNodeName, self.getNodeName(nextNodeName))
-            nodeTupel = (nextNodeName, nodeName,
-                         previousIntervallBorder,
-                         nextIntervallBorder, currentHeight + 1)
+            nodeTupel = (
+                nextNodeName,
+                nodeName,
+                previousIntervallBorder,
+                nextIntervallBorder,
+                currentHeight + 1,
+            )
 
             stackForRecursion.append(nodeTupel)
 
@@ -165,9 +185,7 @@ class BTree_Creator:
             self.buildTree(stackForRecursion)
 
     # ---------------- create values in one node ----------------
-    def createValueArray(self, minVal, maxVal, isLeftChild,
-                         currentHeight):
-
+    def createValueArray(self, minVal, maxVal, isLeftChild, currentHeight):
         distance = maxVal - minVal
 
         if distance == 1:
@@ -194,12 +212,10 @@ class BTree_Creator:
                 high = curMax
                 if low >= high:
                     return None
-                    #raise WrongInputVariables(
-                        #"Die range für diesen Unterknoten besteht nur aus einer Zahl. Wir möchten diese Bäume vermeiden.\n 1. run script again\n 2. Bitte starte Script erneut mit anderen Height- und/oder maxValue-Werten.")
+                    # raise WrongInputVariables(
+                    # "Die range für diesen Unterknoten besteht nur aus einer Zahl. Wir möchten diese Bäume vermeiden.\n 1. run script again\n 2. Bitte starte Script erneut mit anderen Height- und/oder maxValue-Werten.")
 
-            newValue = int(np.random
-                           .random_integers(low=low,
-                                            high=high))
+            newValue = int(np.random.random_integers(low=low, high=high))
             if i > 0 and newValue < values[i - 1]:
                 # now every value is sorted!
                 newValue = values[i - 1]
@@ -211,10 +227,12 @@ class BTree_Creator:
 
         return values
 
-    def determineFillSize(self,currentHeight):
-        fillSizeOfNodes = int(np.random
-                              .random_integers(low=self.myBBaum.halffull,
-                                               high=self.valuesCountInOneNode))
+    def determineFillSize(self, currentHeight):
+        fillSizeOfNodes = int(
+            np.random.random_integers(
+                low=self.myBBaum.halffull, high=self.valuesCountInOneNode
+            )
+        )
         if currentHeight == self.height:
             # we want neither one leaf full nor one leaf half full
             if self.isInsertingTree:
@@ -249,17 +267,17 @@ class BTree_Creator:
     @staticmethod
     def getNodeName(num):
         numOfA_s = num // 26
-        nodeName = ''
+        nodeName = ""
         for _ in range(0, numOfA_s):
-            nodeName += 'A'
+            nodeName += "A"
 
-        return nodeName + str(chr((num % 26) + ord('A')))
+        return nodeName + str(chr((num % 26) + ord("A")))
 
     # insert a number and it return the letter combination
     # for ex: B=2,C=3,AA=27
     @staticmethod
     def convertNodeNameInNumber(name):
-        number = -ord('A')
+        number = -ord("A")
         for char in name:
             number += ord(char)
 
