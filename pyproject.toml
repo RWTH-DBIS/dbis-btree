@@ -23,7 +23,7 @@ dependencies = [
 [options]
 packages = ["dbis_btree"]
 include_package_data = true
-exclude = ["images"]
+exclude = ["examples"]
 
 [build-system]
 requires = ["setuptools>=42"]

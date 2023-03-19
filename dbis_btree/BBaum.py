@@ -30,7 +30,7 @@ class BTree:
         self.halffull = M // 2 + (M % 2)
         self.graph = Digraph(
             "btree",
-            "dot",
+            comment="dot",
             node_attr={
                 "shape": "record",
                 "height": ".05",

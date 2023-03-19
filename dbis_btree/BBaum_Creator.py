@@ -55,7 +55,7 @@ class BTree_Creator:
         randomIndex = 0
         if self.valuesCountInOneNode > 1:
             randomIndex = int(
-                np.random.random_integers(low=0, high=self.valuesCountInOneNode - 1)
+                np.random.randint(low=0, high=self.valuesCountInOneNode - 1)
             )
         return randomIndex
 
@@ -215,7 +215,7 @@ class BTree_Creator:
                     # raise WrongInputVariables(
                     # "Die range für diesen Unterknoten besteht nur aus einer Zahl. Wir möchten diese Bäume vermeiden.\n 1. run script again\n 2. Bitte starte Script erneut mit anderen Height- und/oder maxValue-Werten.")
 
-            newValue = int(np.random.random_integers(low=low, high=high))
+            newValue = int(np.random.randint(low=low, high=high))
             if i > 0 and newValue < values[i - 1]:
                 # now every value is sorted!
                 newValue = values[i - 1]
@@ -229,7 +229,7 @@ class BTree_Creator:
 
     def determineFillSize(self, currentHeight):
         fillSizeOfNodes = int(
-            np.random.random_integers(
+            np.random.randint(
                 low=self.myBBaum.halffull, high=self.valuesCountInOneNode
             )
         )
@@ -263,22 +263,26 @@ class BTree_Creator:
         return fillSizeOfNodes
 
     # insert a number and it return the letter combination
-    # for ex: 2=B,3=C,27=AA
+    # (base26 A-Z)
     @staticmethod
     def getNodeName(num):
-        numOfA_s = num // 26
-        nodeName = ""
-        for _ in range(0, numOfA_s):
-            nodeName += "A"
-
-        return nodeName + str(chr((num % 26) + ord("A")))
+        if num == 0:
+            return "A"
+        base = 26
+        string = ""
+        while num > 0:
+            remainder = num % base
+            char = chr(remainder + 65)  # Convert remainder to ASCII code
+            string = char + string
+            num //= base
+        return string
 
     # insert a number and it return the letter combination
-    # for ex: B=2,C=3,AA=27
+    # (base26 A-Z)
     @staticmethod
     def convertNodeNameInNumber(name):
-        number = -ord("A")
+        base = 26
+        num = 0
         for char in name:
-            number += ord(char)
-
-        return number
+            num = num * base + ord(char) - 65  # Convert ASCII code to remainder
+        return num
