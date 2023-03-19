@@ -33,7 +33,7 @@ bbaum.draw()
 Neue Knoten zum Baum hinzufügen: `add_node(name, elements)`
 
 Geben sie dem Knoten einen _eindeutigen_ Namen und die Zahlen, die im Knoten sich befinden sollen.\
-Wenn im Graph schon der Knoten mit diesem Namen existiert, kommt der Fehler: 
+Wenn im Graph schon der Knoten mit diesem Namen existiert, kommt der Fehler:
 ```python
 AssertionError: Bitte nutze einen anderen Name für diese Node.
 ```
@@ -56,6 +56,7 @@ bbaum.add_node("B", [1,2])
 # nicht vergessen, den baum anzuzeigen:
 bbaum.draw()
 ```
+![B-Tree generated above](./images/image_1.svg)
 
 
 ## Kanten
@@ -80,11 +81,6 @@ bbaum.add_node(name, elements)
 # hinzufügen Knoten B
 bbaum.add_node("B", [1,2])
 
-
-
-
-
-
 # hinzufügen einer Kante an 1st Stelle
 positionImParentNode = 1
 bbaum.add_edge("A", "B", positionImParentNode)
@@ -92,6 +88,7 @@ bbaum.add_edge("A", "B", positionImParentNode)
 # nicht vergessen, den baum anzuzeigen:
 bbaum.draw()
 ```
+![B-Tree generated above](./images/image_2.svg)
 
 ### Häufige Fehler und Warnungen
 
