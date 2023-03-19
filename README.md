@@ -56,7 +56,7 @@ bbaum.add_node("B", [1,2])
 # nicht vergessen, den baum anzuzeigen:
 bbaum.draw()
 ```
-![B-Tree generated above](./images/image_1.svg)
+![B-Tree generated above](./examples/images/image_1.svg)
 
 
 ## Kanten
@@ -88,7 +88,7 @@ bbaum.add_edge("A", "B", positionImParentNode)
 # nicht vergessen, den baum anzuzeigen:
 bbaum.draw()
 ```
-![B-Tree generated above](./images/image_2.svg)
+![B-Tree generated above](./examples/images/image_2.svg)
 
 ### Häufige Fehler und Warnungen
 
