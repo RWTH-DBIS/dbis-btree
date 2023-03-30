@@ -1,4 +1,0 @@
-class Version(object):
-    name="dbis-btree"
-    description="RWTH Aachen Computer Science i5/dbis assets for Lecture Datenbanken und Informationssysteme"
-    version='0.0.2'
