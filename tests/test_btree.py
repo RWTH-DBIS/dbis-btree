@@ -1,5 +1,5 @@
 import pytest
-from dbis_btree.BBaum import BTree
+from src.BBaum import BTree
 
 
 def test_add_node():

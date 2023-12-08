@@ -4,19 +4,31 @@ stages:
     - test
     - build
 
-unit-test-3.11:
-    image: python:3.11
-    stage: test
-    script:
-        - pip install tox
-        - tox -r -e py311
+.test: &test
+  stage: test
+  script:
+    - pip install tox
+    - tox -r -e $TOXENV
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    when: always
+    reports:
+      junit: report/$TOXENV/report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/$TOXENV/coverage.xml
 
-unit-test-3.10:
-    image: python:3.10
-    stage: test
-    script:
-        - pip install tox
-        - tox -r -e py310
+test-py310:
+  image: python:3.10
+  <<: *test
+  variables:
+    TOXENV: py310  
+
+test-py311:
+  image: python:3.11
+  <<: *test
+  variables:
+    TOXENV: py311
 
 formatting-check:
     stage: test
@@ -28,7 +40,7 @@ build-3.10:
     image: python:3.10
     stage: build
     needs:
-        - unit-test-3.10
+        - test-py310
     script:
         - pip install build twine
         - python -m build

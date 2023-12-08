@@ -21,7 +21,7 @@ dependencies = [
 "Homepage" = "https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree"
 
 [options]
-packages = ["dbis_btree"]
+packages = ["src"]
 include_package_data = true
 exclude = ["examples"]
 
