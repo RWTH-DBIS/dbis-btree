@@ -1,6 +1,6 @@
 [project]
 name = "dbis-btree"
-version = "1.0.0"
+version = "1.0.1"
 description = "RWTH Aachen Computer Science i5/dbis assets for Lecture Datenbanken und Informationssysteme"
 authors = [
 	{ name = "Lars Leimbach", email = "hochmann@dbis.rwth-aachen.de" },
