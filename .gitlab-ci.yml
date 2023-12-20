@@ -59,9 +59,10 @@ build-3.10:
         - pip install build twine
         - python -m build
         - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+        # publish to pypi
+        - TWINE_PASSWORD=${PYPI_TOKEN} TWINE_USERNAME=__token__ python -m twine upload dist/*
 
     rules:
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
           changes:
               - pyproject.toml
-        - if: $CI_PIPELINE_SOURCE == "tags"
