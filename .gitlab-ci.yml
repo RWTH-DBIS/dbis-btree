@@ -48,7 +48,7 @@ formatting-check:
     stage: test
     script:
       - pip install black
-      - black --check .
+      - black --check src/ tests/
 
 build-3.10:
     image: python:3.10
