@@ -17,6 +17,15 @@ dependencies = [
 	"ipython",
 ]
 
+[project.optional-dependencies]
+test = [
+    "black==23.12.1"
+]
+build = [
+    "twine==4.*",
+    "build==1.*"
+]
+
 [project.urls]
 "Homepage" = "https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree"
 
@@ -28,3 +37,6 @@ exclude = ["examples"]
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+[tool.black]
+required-version = 23
