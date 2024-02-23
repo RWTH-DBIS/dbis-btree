@@ -1,6 +1,6 @@
 [project]
 name = "dbis-btree"
-version = "1.0.2"
+version = "1.0.4"
 description = "RWTH Aachen Computer Science i5/dbis assets for Lecture Datenbanken und Informationssysteme"
 authors = [
 	{ name = "DBIS i5 RWTH Aachen", email = "dbis-vl@dbis.rwth-aachen.de " },
@@ -30,7 +30,6 @@ build = [
 "Homepage" = "https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree"
 
 [options]
-packages = ["src"]
 include_package_data = true
 exclude = ["examples"]
 
