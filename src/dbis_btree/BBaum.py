@@ -51,57 +51,63 @@ class BTree:
     #  graphiz will save tree in dot-file format
     @staticmethod
     def loadFromDotFile(filepath):
-        graphFile = open(filepath, "r")
+        if isinstance(filepath, str):
+            graphFile = Path(filepath)
+        elif isinstance(filepath, Path):
+            graphFile = filepath
+        else:
+            raise TypeError("filepath must be a str or Path")
+
 
         # following line is to get M value
         #  graph [label="M = 4" splines=line]
-        M_value = graphFile.read().split('"', 2)[1].split(" ")[-1]
+        M_value = graphFile.read_text().split('"', 2)[1].split(" ")[-1]
         newBtree = BTree(int(M_value))
 
-        graphFile = open(filepath, "r")
-        # add nodes to newBtree
-        for line in graphFile:
-            # print("line:",line)
-            if '[label="<' in line:
-                # is a node
-                # we only need to split once because line looks like:
-                #   0 [label="<f1> |18|<f2> |40|<f3> |63|<f4> |85|<f5> "]
-                #   ^nodeName
-                nodeName = line.split(" ", 1)[0]
-                # delte all invisible characters
-                nodeName = "".join(c for c in nodeName if c.isprintable())
-                valuesString = line.split("|")
-                values = []
-                for eventualVal in valuesString:
-                    if eventualVal.isdigit():
-                        values.append(int(eventualVal))
+        with open(graphFile) as f:
+            # add nodes to newBtree
+            for line in f.readlines():
+                # print("line:",line)
+                if '[label="<' in line:
+                    # is a node
+                    # we only need to split once because line looks like:
+                    #   0 [label="<f1> |18|<f2> |40|<f3> |63|<f4> |85|<f5> "]
+                    #   ^nodeName
+                    nodeName = line.split(" ", 1)[0]
+                    # delte all invisible characters
+                    nodeName = "".join(c for c in nodeName if c.isprintable())
+                    valuesString = line.split("|")
+                    values = []
+                    for eventualVal in valuesString:
+                        if eventualVal.isdigit():
+                            values.append(int(eventualVal))
 
-                newBtree.add_node(nodeName, values)
+                    newBtree.add_node(nodeName, values)
 
-            elif ":" in line and "->" in line:
-                # is an edge
-                # strange code therefore look at the dotGraph source code
-                #   0:f1 -> 1
-                #   ^nodeName
-                #   0:f1 -> 1
-                # childNode ^
-                #   0:f1 -> 1
-                #      ^ atParentsPoint
-                splitDot = line.split(":", 1)
-                parentNode = splitDot[0]
-                # delete all invisible characters
-                parentNode = "".join(c for c in parentNode if c.isprintable())
-                # print("parentNode:",parentNode)
-                childNode = line.split(" ")[-1]
-                # delte all invisible characters
-                childNode = "".join(c for c in childNode if c.isprintable())
-                # print("childNode:", childNode)
-                # [1:] delte the first character which is a 'f'
-                atParentsPoint = int(splitDot[1].split(" ", 1)[0][1:])
+                elif ":" in line and "->" in line:
+                    # is an edge
+                    # strange code therefore look at the dotGraph source code
+                    #   0:f1 -> 1
+                    #   ^nodeName
+                    #   0:f1 -> 1
+                    # childNode ^
+                    #   0:f1 -> 1
+                    #      ^ atParentsPoint
+                    splitDot = line.split(":", 1)
+                    parentNode = splitDot[0]
+                    # delete all invisible characters
+                    parentNode = "".join(c for c in parentNode if c.isprintable())
+                    # print("parentNode:",parentNode)
+                    childNode = line.split(" ")[-1]
+                    # delte all invisible characters
+                    childNode = "".join(c for c in childNode if c.isprintable())
+                    # print("childNode:", childNode)
+                    # [1:] delte the first character which is a 'f'
+                    atParentsPoint = int(splitDot[1].split(" ", 1)[0][1:])
 
-                # print("atParentsPoint:", atParentsPoint)
+                    # print("atParentsPoint:", atParentsPoint)
 
-                newBtree.add_edge(parentNode, childNode, atParentsPoint)
+                    newBtree.add_edge(parentNode, childNode, atParentsPoint)
 
         return newBtree
 
