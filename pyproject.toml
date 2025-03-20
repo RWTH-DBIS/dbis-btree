@@ -16,6 +16,15 @@ dependencies = [
 	"graphviz",
 	"ipython",
 ]
+[project.optional-dependencies]
+test = [
+  	"pytest",
+  	"pytest-cov",
+	"tox"
+]
+lint = [
+  	"ruff",
+]
 
 [project.urls]
 "Homepage" = "https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree"
