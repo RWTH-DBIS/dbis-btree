@@ -152,7 +152,7 @@ class BTree:
             self.nodeArray = [Node(name, elements, self.valuesCountInNode)]
             self.identifierArray.append(name)
         elif name in self.identifierArray:
-            assert False, "Bitte nutze einen anderen Name für diese Node."
+            raise AssertionError("Bitte nutze einen anderen Name für diese Node.")
         else:
             self.nodeArray.append(Node(name, elements, self.valuesCountInNode))
             self.identifierArray.append(name)
