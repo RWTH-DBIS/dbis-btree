@@ -48,7 +48,6 @@ class BTree:
         #  that was already inserted -> throw an error
         self.identifierArray = []
 
-
     # if you used myBBaum.graph.render(filename='graph.dot')
     #  graphiz will save tree in dot-file format
     @staticmethod

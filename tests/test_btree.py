@@ -148,7 +148,6 @@ def test_generateCopyText():
     assert copy_text == expected_text
 
 
-
 def test_disallow_trees_with_odd_M():
     """
     tests if only even numbers are allowed
@@ -157,4 +156,3 @@ def test_disallow_trees_with_odd_M():
     with pytest.raises(ValueError) as e:
         BTree(3)
     assert isinstance(BTree(4), BTree)
-
