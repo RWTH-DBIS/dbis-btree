@@ -103,7 +103,7 @@ def test_valueIsInBbaum():
     assert btree.valueIsInBbaum(30) is False
 
 
-def test_isLeafNode():
+def test_isLeafNode2():
     btree = BTree(3)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
@@ -113,7 +113,7 @@ def test_isLeafNode():
     assert BTree.isLeafNode(btree.getNode("B")) is True
 
 
-def test_getSibling():
+def test_getSibling2():
     btree = BTree(3)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
