@@ -4,7 +4,7 @@ from dbis_btree.BBaum import BTree
 
 
 def test_add_node():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     assert len(tree.nodeArray) == 2
@@ -15,7 +15,7 @@ def test_add_node():
 
 
 def test_add_duplicate_node():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     with pytest.raises(
         AssertionError, match="Bitte nutze einen anderen Name für diese Node."
@@ -24,7 +24,7 @@ def test_add_duplicate_node():
 
 
 def test_add_edge():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     tree.add_edge("A", "B", 1)
@@ -32,7 +32,7 @@ def test_add_edge():
 
 
 def test_add_invalid_edge():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     with pytest.raises(
@@ -43,7 +43,7 @@ def test_add_invalid_edge():
 
 
 def test_getNode():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     node = tree.getNode("A")
@@ -53,7 +53,7 @@ def test_getNode():
 
 
 def test_isLeafNode():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     tree.add_edge("A", "B", 1)
@@ -62,7 +62,7 @@ def test_isLeafNode():
 
 
 def test_getSibling():
-    tree = BTree(3)
+    tree = BTree(4)
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     tree.add_node("C", [30, 40])
@@ -75,7 +75,7 @@ def test_getSibling():
 
 
 def test_deleteNode():
-    btree = BTree(3)
+    btree = BTree(4)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
     btree.add_node("C", [15, 16])
@@ -96,7 +96,7 @@ def test_deleteNode():
 
 
 def test_valueIsInBbaum():
-    btree = BTree(3)
+    btree = BTree(4)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
     assert btree.valueIsInBbaum(10) is True
@@ -105,7 +105,7 @@ def test_valueIsInBbaum():
 
 
 def test_isLeafNode2():
-    btree = BTree(3)
+    btree = BTree(4)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
     btree.add_edge("A", "B", 1)
@@ -115,7 +115,7 @@ def test_isLeafNode2():
 
 
 def test_getSibling2():
-    btree = BTree(3)
+    btree = BTree(4)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
     btree.add_node("C", [15, 16])
@@ -134,7 +134,7 @@ def test_getSibling2():
 
 
 def test_generateCopyText():
-    btree = BTree(3)
+    btree = BTree(4)
     btree.add_node("A", [10, 20])
     btree.add_node("B", [5, 6])
     btree.add_edge("A", "B", 1)
@@ -146,3 +146,15 @@ def test_generateCopyText():
         "btree.add_edge('A', 'B', 1)\n"
     )
     assert copy_text == expected_text
+
+
+
+def test_disallow_trees_with_odd_M():
+    """
+    tests if only even numbers are allowed
+    see issue https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree/-/issues/5
+    """
+    with pytest.raises(ValueError) as e:
+        BTree(3)
+    assert isinstance(BTree(4), BTree)
+

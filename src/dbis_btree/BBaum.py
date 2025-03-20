@@ -24,7 +24,9 @@ class Node:
 
 
 class BTree:
-    def __init__(self, M):
+    def __init__(self, M: int):
+        if M % 2 != 0:
+            raise ValueError("M must be an even value")
         self.valuesCountInNode = M
         self.halffull = M // 2 + (M % 2)
         self.graph = Digraph(
@@ -45,6 +47,7 @@ class BTree:
         # if someone insert a node with an id
         #  that was already inserted -> throw an error
         self.identifierArray = []
+
 
     # if you used myBBaum.graph.render(filename='graph.dot')
     #  graphiz will save tree in dot-file format
