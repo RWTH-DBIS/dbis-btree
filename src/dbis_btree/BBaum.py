@@ -1,9 +1,8 @@
-import copy
+import warnings
+from pathlib import Path
 
 from graphviz import Digraph, nohtml
 from IPython.display import display
-from string import printable
-import warnings
 
 
 class Node:
@@ -127,7 +126,7 @@ class BTree:
         # add edges
         for node in oldBtree.nodeArray:
             for i, child in enumerate(node.nextNodes):
-                if child != None:
+                if child is not None:
                     # print("length of node",len(node.nextNodes))
                     newTree.add_edge(node.identifier, child.identifier, i + 1)
 
@@ -165,7 +164,7 @@ class BTree:
         childNode = self.getNode(child)
 
         assert (
-            parentNode != None and childNode != None
+            parentNode is not None and childNode is not None
         ), "internal bug: could not find parent or child node in nodeArray."
 
         # add in previous or next node array
@@ -176,11 +175,11 @@ class BTree:
                 (
                     x
                     for x in parentNode.nextNodes
-                    if x != None and childNode.identifier == x.identifier
+                    if x is not None and childNode.identifier == x.identifier
                 ),
                 None,
             )
-            == None
+            is None
         )
         if isNotInNextArray:
             # index of the node in nextnodes determindes how the tree locks like
@@ -198,7 +197,7 @@ class BTree:
         # if there are two rootNodes return None
         rootNodes = []
         for node in self.nodeArray:
-            if node.previousNode == None:
+            if node.previousNode is None:
                 rootNodes.append(node)
         if len(rootNodes) != 1:
             return None
@@ -206,8 +205,8 @@ class BTree:
 
     def delteNode(self, nodeID):
         node = next((x for x in self.nodeArray if nodeID == x.identifier), None)
-        if not nodeID in self.identifierArray or node == None:
-            warnings.warn("Node ID: " + nodeID + " does not exist.")
+        if nodeID not in self.identifierArray or node is None:
+            warnings.warn("Node ID: " + nodeID + " does not exist.", stacklevel=2)
             return
 
         # delte from own datastructure
@@ -218,13 +217,13 @@ class BTree:
                 continue
             # delte if node was parent
             if (
-                tmpNode.previousNode != None
+                tmpNode.previousNode is not None
                 and tmpNode.previousNode.identifier == nodeID
             ):
                 tmpNode.previousNode = None
             # delete if node is next node
             for i, child in enumerate(tmpNode.nextNodes):
-                if child != None and child.identifier == nodeID:
+                if child is not None and child.identifier == nodeID:
                     tmpNode.nextNodes[i] = None
 
         # delete from graphviz data structure
@@ -234,10 +233,7 @@ class BTree:
         # IMPORTANT but do it in upper function call
 
     def valueIsInBbaum(self, value):
-        for node in self.nodeArray:
-            if value in node.values:
-                return True
-        return False
+        return any(value in node.values for node in self.nodeArray)
 
     @staticmethod
     def isLeafNode(node):
@@ -245,15 +241,15 @@ class BTree:
 
     @staticmethod
     def getSibling(currentNode, bool_getLeft):
-        if currentNode.previousNode == None:
+        if currentNode.previousNode is None:
             return None
 
         # save in variable because I chose a too long name
         indexNextNodes = currentNode.positionInParent_nextNodesArray
 
-        if indexNextNodes == None:
+        if indexNextNodes is None:
             # should ... never be the case...
-            warnings.warn("WARNING: positionInParent_nextNodesArray is None!")
+            warnings.warn("WARNING: positionInParent_nextNodesArray is None!", stacklevel=2)
             return None
 
         if bool_getLeft:
@@ -268,10 +264,10 @@ class BTree:
             return currentNode.previousNode.nextNodes[indexNextNodes + 1]
 
     # its easier for students if they can easily copy the generate graph text
-    # in order to make the exercsie
+    # in order to make the exercise
     @staticmethod
     def generateCopyText(node, text, treeName):
-        if node == None:
+        if node is None:
             return ""
         tmpText = (
             treeName
@@ -282,7 +278,7 @@ class BTree:
             + ")\n"
         )
         for i, child in enumerate(node.nextNodes):
-            if child != None:
+            if child is not None:
                 tmpText += BTree.generateCopyText(child, text, treeName)
                 tmpText += (
                     treeName

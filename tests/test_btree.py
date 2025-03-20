@@ -1,4 +1,5 @@
 import pytest
+
 from dbis_btree.BBaum import BTree
 
 
@@ -48,7 +49,7 @@ def test_getNode():
     node = tree.getNode("A")
     assert node.identifier == "A"
     assert node.values == [10, 20]
-    assert tree.getNode("C") == None
+    assert tree.getNode("C") is None
 
 
 def test_isLeafNode():
@@ -56,8 +57,8 @@ def test_isLeafNode():
     tree.add_node("A", [10, 20])
     tree.add_node("B", [1, 2])
     tree.add_edge("A", "B", 1)
-    assert BTree.isLeafNode(tree.nodeArray[0]) == False
-    assert BTree.isLeafNode(tree.nodeArray[1]) == True
+    assert not BTree.isLeafNode(tree.nodeArray[0])
+    assert BTree.isLeafNode(tree.nodeArray[1])
 
 
 def test_getSibling():
@@ -67,10 +68,10 @@ def test_getSibling():
     tree.add_node("C", [30, 40])
     tree.add_edge("A", "B", 1)
     tree.add_edge("A", "C", 2)
-    assert BTree.getSibling(tree.nodeArray[1], True) == None
+    assert BTree.getSibling(tree.nodeArray[1], True) is None
     assert BTree.getSibling(tree.nodeArray[1], False) == tree.nodeArray[2]
     assert BTree.getSibling(tree.nodeArray[2], True) == tree.nodeArray[1]
-    assert BTree.getSibling(tree.nodeArray[2], False) == None
+    assert BTree.getSibling(tree.nodeArray[2], False) is None
 
 
 def test_deleteNode():
