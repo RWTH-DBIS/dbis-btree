@@ -57,7 +57,6 @@ class BTree:
         else:
             raise TypeError("filepath must be a str or Path")
 
-
         # following line is to get M value
         #  graph [label="M = 4" splines=line]
         M_value = graphFile.read_text().split('"', 2)[1].split(" ")[-1]
@@ -249,7 +248,9 @@ class BTree:
 
         if indexNextNodes is None:
             # should ... never be the case...
-            warnings.warn("WARNING: positionInParent_nextNodesArray is None!", stacklevel=2)
+            warnings.warn(
+                "WARNING: positionInParent_nextNodesArray is None!", stacklevel=2
+            )
             return None
 
         if bool_getLeft:
