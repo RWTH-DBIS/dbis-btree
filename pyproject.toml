@@ -5,16 +5,26 @@ description = "RWTH Aachen Computer Science i5/dbis assets for Lecture Datenbank
 authors = [
 	{ name = "DBIS i5 RWTH Aachen", email = "dbis-vl@dbis.rwth-aachen.de " },
 ]
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
 	"Programming Language :: Python :: 3.10",
 	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.13",
 ]
 dependencies = [
 	"numpy",
 	"graphviz",
 	"ipython",
+]
+[project.optional-dependencies]
+test = [
+    "black==23.12.1"
+]
+build = [
+    "twine==6.*",
+    "build==1.*"
 ]
 
 [project.urls]

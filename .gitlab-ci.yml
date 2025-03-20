@@ -44,19 +44,25 @@ test-py311:
   variables:
     TOXENV: py311
 
+test-py313:
+  image: python:3.13
+  <<: *test
+  variables:
+    TOXENV: py313
+
 formatting-check:
     stage: test
     script:
-      - pip install black
+      - pip install .[test]
       - black --check .
 
-build-3.10:
-    image: python:3.10
+build-job:
+    image: python:3.13
     stage: build
     needs:
-        - test-py310
+        - test-py313
     script:
-        - pip install build twine
+        - pip install .[build]
         - python -m build
         - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
         # publish to pypi
