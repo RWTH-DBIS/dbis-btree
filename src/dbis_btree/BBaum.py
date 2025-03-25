@@ -224,9 +224,9 @@ class BTree:
             ):
                 tmpNode.previousNode = None
             # delete if node is next node
-            for i, child in enumerate(tmpNode.nextNodes):
+            for j, child in enumerate(tmpNode.nextNodes):
                 if child is not None and child.identifier == nodeID:
-                    tmpNode.nextNodes[i] = None
+                    tmpNode.nextNodes[j] = None
 
         # delete from graphviz data structure
         #  easy trick: just create the newTree we are having NOW
