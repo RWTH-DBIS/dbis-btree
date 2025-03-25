@@ -44,6 +44,9 @@ exclude = ["examples"]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 
+[tool.black]
+required-version = 23
+
 [tool.ruff]
 target-version = "py313"
 line-length = 120

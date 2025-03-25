@@ -18,7 +18,7 @@ def test_add_duplicate_node():
     tree = BTree(4)
     tree.add_node("A", [10, 20])
     with pytest.raises(
-        AssertionError, match="Bitte nutze einen anderen Name für diese Node."
+        AssertionError, match="Bitte nutze einen anderen Namen für diese Node."
     ):
         tree.add_node("A", [15, 25])
 
@@ -156,3 +156,76 @@ def test_disallow_trees_with_odd_M():
     with pytest.raises(ValueError) as e:
         BTree(3)
     assert isinstance(BTree(4), BTree)
+
+
+# ---------- Strings -------------
+def test_add_string_node():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    tree.add_node("B", [1, 2])
+    assert len(tree.nodeArray) == 2
+    assert tree.nodeArray[0].identifier == "A"
+    assert tree.nodeArray[0].values == ["C", 20]
+    assert tree.nodeArray[1].identifier == "B"
+    assert tree.nodeArray[1].values == [1, 2]
+    tree.draw()
+
+
+def test_add_duplicate_string_node():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    with pytest.raises(
+        AssertionError, match="Bitte nutze einen anderen Namen für diese Node."
+    ):
+        tree.add_node("A", ["C", 20])
+
+
+def test_add_string_edge():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    tree.add_node("B", [1, "D"])
+    tree.add_edge("A", "B", 1)
+    assert tree.nodeArray[0].nextNodes[0] == tree.nodeArray[1]
+
+
+def test_add_invalid_string_edge():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    tree.add_node("B", [1, "D"])
+    with pytest.raises(
+        AssertionError,
+        match="internal bug: could not find parent or child node in nodeArray.",
+    ):
+        tree.add_edge("A", "C", 1)
+
+
+def test_getStringNode():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    tree.add_node("B", [1, "D"])
+    node = tree.getNode("A")
+    assert node.identifier == "A"
+    assert node.values == ["C", 20]
+    assert tree.getNode("C") == None
+
+
+def test_isStringLeafNode():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    tree.add_node("B", [1, "D"])
+    tree.add_edge("A", "B", 1)
+    assert BTree.isLeafNode(tree.nodeArray[0]) == False
+    assert BTree.isLeafNode(tree.nodeArray[1]) == True
+
+
+def test_getStringSibling():
+    tree = BTree(4)
+    tree.add_node("A", ["C", 20])
+    tree.add_node("B", [1, "D"])
+    tree.add_node("C", ["E", 40])
+    tree.add_edge("A", "B", 1)
+    tree.add_edge("A", "C", 2)
+    assert BTree.getSibling(tree.nodeArray[1], True) == None
+    assert BTree.getSibling(tree.nodeArray[1], False) == tree.nodeArray[2]
+    assert BTree.getSibling(tree.nodeArray[2], True) == tree.nodeArray[1]
+    assert BTree.getSibling(tree.nodeArray[2], False) == None

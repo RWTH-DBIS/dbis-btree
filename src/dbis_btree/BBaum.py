@@ -9,9 +9,7 @@ from IPython.display import display
 class Node:
     # if root node then previousNode will be None
     def __init__(self, identifier, values, valuesCountInNode, posInParentArray=None):
-        assert all(
-            isinstance(item, int) for item in values
-        ), "values has to be a int-list"
+        assert isinstance(values, list), "values has to be a tuple"
         self.previousNode = None
         self.positionInParent_nextNodesArray = (
             posInParentArray  # easier to get siblings
@@ -80,8 +78,16 @@ class BTree:
                     valuesString = line.split("|")
                     values = []
                     for eventualVal in valuesString:
-                        if eventualVal.isdigit():
+                        if eventualVal.isdigit():  # Check if it's an integer
                             values.append(int(eventualVal))
+                        else:
+                            try:
+                                # Try converting eventualVal to float
+                                value = float(eventualVal)
+                                values.append(value)
+                            except ValueError:
+                                # If conversion to float fails, keep it as a string
+                                values.append(eventualVal)
 
                     newBtree.add_node(nodeName, values)
 
@@ -102,14 +108,10 @@ class BTree:
                     childNode = line.split(" ")[-1]
                     # delte all invisible characters
                     childNode = "".join(c for c in childNode if c.isprintable())
-                    # print("childNode:", childNode)
-                    # [1:] delte the first character which is a 'f'
-                    atParentsPoint = int(splitDot[1].split(" ", 1)[0][1:])
+                    atParentsPoint = float(splitDot[1].split(" ", 1)[0][1:])
 
                     # print("atParentsPoint:", atParentsPoint)
-
                     newBtree.add_edge(parentNode, childNode, atParentsPoint)
-
         return newBtree
 
     # this method takes the node-datastructure form
@@ -139,9 +141,6 @@ class BTree:
         res_str = "<f" + str(i) + "> "
 
         for x in elements:
-            if not isinstance(x, int):
-                print(str(x) + " should be an integer.")
-
             i = i + 1
             append_str = "|" + str(x) + "|<f" + str(i) + "> "
             res_str = res_str + append_str
@@ -153,7 +152,7 @@ class BTree:
             self.nodeArray = [Node(name, elements, self.valuesCountInNode)]
             self.identifierArray.append(name)
         elif name in self.identifierArray:
-            raise AssertionError("Bitte nutze einen anderen Name für diese Node.")
+            raise AssertionError("Bitte nutze einen anderen Namen für diese Node.")
         else:
             self.nodeArray.append(Node(name, elements, self.valuesCountInNode))
             self.identifierArray.append(name)
@@ -211,7 +210,7 @@ class BTree:
             warnings.warn("Node ID: " + nodeID + " does not exist.", stacklevel=2)
             return
 
-        # delte from own datastructure
+        # delete from own datastructure
         self.identifierArray.remove(nodeID)
         for i, tmpNode in enumerate(self.nodeArray):
             if tmpNode.identifier == nodeID:
