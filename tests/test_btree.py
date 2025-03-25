@@ -85,14 +85,14 @@ def test_deleteNode():
     btree.add_edge("A", "D", 3)
 
     assert btree.getNode("B") is not None
-    btree.delteNode("B")
+    btree.deleteNode("B")
     # Update the graph after deleting the node
     btree = BTree.updateGraph(btree)
     assert btree.getNode("B") is None
 
     # Test deleting non-existent node
     with pytest.warns(UserWarning, match="Node ID: E does not exist."):
-        btree.delteNode("E")
+        btree.deleteNode("E")
 
 
 def test_valueIsInBbaum():

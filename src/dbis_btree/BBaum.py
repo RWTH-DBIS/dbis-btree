@@ -1,5 +1,6 @@
 import warnings
 from pathlib import Path
+from typing import Union
 
 from graphviz import Digraph, nohtml
 from IPython.display import display
@@ -204,7 +205,7 @@ class BTree:
             return None
         return rootNodes[0]
 
-    def delteNode(self, nodeID):
+    def deleteNode(self, nodeID):
         node = next((x for x in self.nodeArray if nodeID == x.identifier), None)
         if nodeID not in self.identifierArray or node is None:
             warnings.warn("Node ID: " + nodeID + " does not exist.", stacklevel=2)
@@ -237,11 +238,11 @@ class BTree:
         return any(value in node.values for node in self.nodeArray)
 
     @staticmethod
-    def isLeafNode(node):
+    def isLeafNode(node: Node) -> bool:
         return node.nextNodes.count(None) == len(node.nextNodes)
 
     @staticmethod
-    def getSibling(currentNode, bool_getLeft):
+    def getSibling(currentNode: Node, bool_getLeft: bool) -> Union[Node, None]:
         if currentNode.previousNode is None:
             return None
 

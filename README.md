@@ -34,7 +34,7 @@ Neue Knoten zum Baum hinzufügen: `add_node(name, elements)`
 
 Geben sie dem Knoten einen _eindeutigen_ Namen und die Zahlen, die im Knoten sich befinden sollen.\
 Wenn im Graph schon der Knoten mit diesem Namen existiert, kommt der Fehler:
-```python
+```commandline
 AssertionError: Bitte nutze einen anderen Name für diese Node.
 ```
 
