@@ -86,8 +86,7 @@ def test_deleteNode():
 
     assert btree.getNode("B") is not None
     btree.deleteNode("B")
-    # Update the graph after deleting the node
-    btree = BTree.updateGraph(btree)
+
     assert btree.getNode("B") is None
 
     # Test deleting non-existent node
@@ -140,11 +139,7 @@ def test_generateCopyText():
     btree.add_edge("A", "B", 1)
 
     copy_text = BTree.generateCopyText(btree.getRootNode(), "", "btree")
-    expected_text = (
-        "btree.add_node('A', [10, 20])\n"
-        "btree.add_node('B', [5, 6])\n"
-        "btree.add_edge('A', 'B', 1)\n"
-    )
+    expected_text = "btree.add_node('A', [10, 20])\nbtree.add_node('B', [5, 6])\nbtree.add_edge('A', 'B', 1)\n"
     assert copy_text == expected_text
 
 
@@ -153,7 +148,7 @@ def test_disallow_trees_with_odd_M():
     tests if only even numbers are allowed
     see issue https://git.rwth-aachen.de/i5/teaching/dbis/dbis-btree/-/issues/5
     """
-    with pytest.raises(ValueError) as e:
+    with pytest.raises(ValueError):
         BTree(3)
     assert isinstance(BTree(4), BTree)
 
@@ -206,7 +201,7 @@ def test_getStringNode():
     node = tree.getNode("A")
     assert node.identifier == "A"
     assert node.values == ["C", 20]
-    assert tree.getNode("C") == None
+    assert tree.getNode("C") is None
 
 
 def test_isStringLeafNode():
@@ -214,8 +209,8 @@ def test_isStringLeafNode():
     tree.add_node("A", ["C", 20])
     tree.add_node("B", [1, "D"])
     tree.add_edge("A", "B", 1)
-    assert BTree.isLeafNode(tree.nodeArray[0]) == False
-    assert BTree.isLeafNode(tree.nodeArray[1]) == True
+    assert not BTree.isLeafNode(tree.nodeArray[0])
+    assert BTree.isLeafNode(tree.nodeArray[1])
 
 
 def test_getStringSibling():
@@ -225,7 +220,7 @@ def test_getStringSibling():
     tree.add_node("C", ["E", 40])
     tree.add_edge("A", "B", 1)
     tree.add_edge("A", "C", 2)
-    assert BTree.getSibling(tree.nodeArray[1], True) == None
+    assert BTree.getSibling(tree.nodeArray[1], True) is None
     assert BTree.getSibling(tree.nodeArray[1], False) == tree.nodeArray[2]
     assert BTree.getSibling(tree.nodeArray[2], True) == tree.nodeArray[1]
-    assert BTree.getSibling(tree.nodeArray[2], False) == None
+    assert BTree.getSibling(tree.nodeArray[2], False) is None

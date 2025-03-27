@@ -1,14 +1,21 @@
 import warnings
-from pathlib import Path
-from typing import Union
 
 from graphviz import Digraph, nohtml
 from IPython.display import display
 
+NODE_ID_TYPE = str | int
+NODE_VALUE_TYPE = list[str | int | float]
+
 
 class Node:
     # if root node then previousNode will be None
-    def __init__(self, identifier, values, valuesCountInNode, posInParentArray=None):
+    def __init__(
+        self,
+        identifier: NODE_ID_TYPE,
+        values: NODE_VALUE_TYPE,
+        valuesCountInNode: int,
+        posInParentArray=None,
+    ):
         assert isinstance(values, list), "values has to be a tuple"
         self.previousNode = None
         self.positionInParent_nextNodesArray = (
@@ -17,9 +24,23 @@ class Node:
         self.identifier = identifier  # unique identifier
         self.values = values  # e.g. Int-Array
         self.valuesCountInNode = valuesCountInNode
-        self.nextNodes = [None] * (
+        self.nextNodes: list[Node | None] = [None] * (
             valuesCountInNode + 1
         )  # all children are firstly None
+
+    def get_dot_label(self) -> str:
+        """
+        Returns a dot representation of the node
+        definition of the node and its relations to its childs
+        """
+        i = 1
+        res_str = "<f" + str(i) + "> "
+
+        for x in self.values:
+            i = i + 1
+            append_str = "|" + str(x) + "|<f" + str(i) + "> "
+            res_str = res_str + append_str
+        return res_str
 
 
 class BTree:
@@ -28,7 +49,19 @@ class BTree:
             raise ValueError("M must be an even value")
         self.valuesCountInNode = M
         self.halffull = M // 2 + (M % 2)
-        self.graph = Digraph(
+
+        # all the node that were added
+        self.nodeArray: list[Node] = []
+        # if someone insert a node with an id
+        #  that was already inserted -> throw an error
+        self.identifierArray = []
+
+    @property
+    def graph(self) -> Digraph:
+        """
+        Generate the Btree graph
+        """
+        graph = Digraph(
             "btree",
             comment="dot",
             node_attr={
@@ -38,115 +71,19 @@ class BTree:
                 "style": "filled",
                 "fillcolor": "#FFFFFF",
             },
-            graph_attr={"splines": "line", "label": "M = " + str(M)},
+            graph_attr={
+                "splines": "line",
+                "label": "M = " + str(self.valuesCountInNode),
+            },
         )
-
-        # all the node that were added
-        self.nodeArray = []
-        # if someone insert a node with an id
-        #  that was already inserted -> throw an error
-        self.identifierArray = []
-
-    # if you used myBBaum.graph.render(filename='graph.dot')
-    #  graphiz will save tree in dot-file format
-    @staticmethod
-    def loadFromDotFile(filepath):
-        if isinstance(filepath, str):
-            graphFile = Path(filepath)
-        elif isinstance(filepath, Path):
-            graphFile = filepath
-        else:
-            raise TypeError("filepath must be a str or Path")
-
-        # following line is to get M value
-        #  graph [label="M = 4" splines=line]
-        M_value = graphFile.read_text().split('"', 2)[1].split(" ")[-1]
-        newBtree = BTree(int(M_value))
-
-        with open(graphFile) as f:
-            # add nodes to newBtree
-            for line in f.readlines():
-                # print("line:",line)
-                if '[label="<' in line:
-                    # is a node
-                    # we only need to split once because line looks like:
-                    #   0 [label="<f1> |18|<f2> |40|<f3> |63|<f4> |85|<f5> "]
-                    #   ^nodeName
-                    nodeName = line.split(" ", 1)[0]
-                    # delte all invisible characters
-                    nodeName = "".join(c for c in nodeName if c.isprintable())
-                    valuesString = line.split("|")
-                    values = []
-                    for eventualVal in valuesString:
-                        if eventualVal.isdigit():  # Check if it's an integer
-                            values.append(int(eventualVal))
-                        else:
-                            try:
-                                # Try converting eventualVal to float
-                                value = float(eventualVal)
-                                values.append(value)
-                            except ValueError:
-                                # If conversion to float fails, keep it as a string
-                                values.append(eventualVal)
-
-                    newBtree.add_node(nodeName, values)
-
-                elif ":" in line and "->" in line:
-                    # is an edge
-                    # strange code therefore look at the dotGraph source code
-                    #   0:f1 -> 1
-                    #   ^nodeName
-                    #   0:f1 -> 1
-                    # childNode ^
-                    #   0:f1 -> 1
-                    #      ^ atParentsPoint
-                    splitDot = line.split(":", 1)
-                    parentNode = splitDot[0]
-                    # delete all invisible characters
-                    parentNode = "".join(c for c in parentNode if c.isprintable())
-                    # print("parentNode:",parentNode)
-                    childNode = line.split(" ")[-1]
-                    # delte all invisible characters
-                    childNode = "".join(c for c in childNode if c.isprintable())
-                    atParentsPoint = float(splitDot[1].split(" ", 1)[0][1:])
-
-                    # print("atParentsPoint:", atParentsPoint)
-                    newBtree.add_edge(parentNode, childNode, atParentsPoint)
-        return newBtree
-
-    # this method takes the node-datastructure form
-    #  the old tree and build a new tree based on this
-    #  node-datastructure
-    @staticmethod
-    def updateGraph(oldBtree):
-        newTree = BTree(oldBtree.valuesCountInNode)
-        # add nodes
-        for node in oldBtree.nodeArray:
-            newTree.add_node(node.identifier, node.values)
-            curNode = newTree.getNode(node.identifier)
-            # ugly bufix workaround
-            curNode.nextNodes = [None] * len(node.nextNodes)
-
-        # add edges
-        for node in oldBtree.nodeArray:
-            for i, child in enumerate(node.nextNodes):
+        for node in self.nodeArray:
+            graph.node(node.identifier, nohtml(node.get_dot_label()))
+            for n_child, child in enumerate(node.nextNodes, 1):
                 if child is not None:
-                    # print("length of node",len(node.nextNodes))
-                    newTree.add_edge(node.identifier, child.identifier, i + 1)
+                    graph.edge(node.identifier + ":f" + str(n_child), child.identifier)
+        return graph
 
-        return newTree
-
-    def add_node(self, name, elements):
-        i = 1
-        res_str = "<f" + str(i) + "> "
-
-        for x in elements:
-            i = i + 1
-            append_str = "|" + str(x) + "|<f" + str(i) + "> "
-            res_str = res_str + append_str
-
-        self.graph.node(name, nohtml(res_str))
-
+    def add_node(self, name: NODE_ID_TYPE, elements: NODE_VALUE_TYPE):
         if len(self.identifierArray) == 0:
             # root node
             self.nodeArray = [Node(name, elements, self.valuesCountInNode)]
@@ -157,9 +94,7 @@ class BTree:
             self.nodeArray.append(Node(name, elements, self.valuesCountInNode))
             self.identifierArray.append(name)
 
-    def add_edge(self, parent, child, n_child):
-        self.graph.edge(parent + ":f" + str(n_child), child)
-
+    def add_edge(self, parent: NODE_ID_TYPE, child: NODE_ID_TYPE, n_child: int) -> None:
         # search both nodes and add their relations
         parentNode = self.getNode(parent)
         childNode = self.getNode(child)
@@ -191,7 +126,7 @@ class BTree:
                 parentNode.nextNodes[n_child - 1] = childNode
             childNode.positionInParent_nextNodesArray = n_child - 1
 
-    def getNode(self, nodeID):
+    def getNode(self, nodeID: NODE_ID_TYPE) -> Node | None:
         return next((x for x in self.nodeArray if x.identifier == nodeID), None)
 
     def getRootNode(self):
@@ -204,7 +139,7 @@ class BTree:
             return None
         return rootNodes[0]
 
-    def deleteNode(self, nodeID):
+    def deleteNode(self, nodeID: NODE_ID_TYPE):
         node = next((x for x in self.nodeArray if nodeID == x.identifier), None)
         if nodeID not in self.identifierArray or node is None:
             warnings.warn("Node ID: " + nodeID + " does not exist.", stacklevel=2)
@@ -216,22 +151,19 @@ class BTree:
             if tmpNode.identifier == nodeID:
                 self.nodeArray.pop(i)
                 continue
-            # delte if node was parent
+            # delete if node was parent
             if (
                 tmpNode.previousNode is not None
                 and tmpNode.previousNode.identifier == nodeID
             ):
-                tmpNode.previousNode = None
+                if node.previousNode is not None:
+                    tmpNode.previousNode = node.previousNode
+                else:
+                    tmpNode.previousNode = None
             # delete if node is next node
             for j, child in enumerate(tmpNode.nextNodes):
                 if child is not None and child.identifier == nodeID:
                     tmpNode.nextNodes[j] = None
-
-        # delete from graphviz data structure
-        #  easy trick: just create the newTree we are having NOW
-        #  and set it to self
-        # self = BTree.updateGraph(self)
-        # IMPORTANT but do it in upper function call
 
     def valueIsInBbaum(self, value):
         return any(value in node.values for node in self.nodeArray)
@@ -241,7 +173,7 @@ class BTree:
         return node.nextNodes.count(None) == len(node.nextNodes)
 
     @staticmethod
-    def getSibling(currentNode: Node, bool_getLeft: bool) -> Union[Node, None]:
+    def getSibling(currentNode: Node, bool_getLeft: bool) -> Node | None:
         if currentNode.previousNode is None:
             return None
 
@@ -266,33 +198,23 @@ class BTree:
 
             return currentNode.previousNode.nextNodes[indexNextNodes + 1]
 
-    # its easier for students if they can easily copy the generate graph text
-    # in order to make the exercise
     @staticmethod
-    def generateCopyText(node, text, treeName):
+    def generateCopyText(node: Node, text: str, treeName: str):
+        """
+        its easier for students if they can easily copy the generate graph text in order to make the exercise
+        :param node:
+        :param text:
+        :param treeName:
+        :return:
+        """
         if node is None:
             return ""
-        tmpText = (
-            treeName
-            + ".add_node('"
-            + str(node.identifier)
-            + "', "
-            + str(node.values)
-            + ")\n"
-        )
+        tmpText = f"{treeName}.add_node('{node.identifier}', {node.values})\n"
         for i, child in enumerate(node.nextNodes):
             if child is not None:
                 tmpText += BTree.generateCopyText(child, text, treeName)
-                tmpText += (
-                    treeName
-                    + ".add_edge('"
-                    + node.identifier
-                    + "', '"
-                    + child.identifier
-                    + "', "
-                    + str(i + 1)
-                    + ")\n"
-                )
+                tmpText += f"{treeName}.add_edge('{node.identifier}', '{child.identifier}', {i + 1})\n"
+
         return text + tmpText
 
     def draw(self):
