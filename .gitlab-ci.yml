@@ -44,6 +44,12 @@ test-py311:
   variables:
     TOXENV: py311
 
+test-py312:
+  image: python:3.12
+  <<: *test
+  variables:
+    TOXENV: py312
+
 test-py313:
   image: python:3.13
   <<: *test
