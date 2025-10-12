@@ -1,0 +1,132 @@
+name: Python package
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  PIP_CACHE_DIR: /root/.cache/pip
+          
+jobs:
+  test-py310:
+    runs-on: ubuntu-22.04
+    container: python:3.10
+    env: 
+      TOXENV: py310  
+    steps:
+      - uses: actions/checkout@v4
+
+      - &cache-pip
+        name: Cache pip
+        uses: actions/cache@v4
+        id: cache-pip
+        with:
+          path: /root/.cache/pip   
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+              
+      - &before-script
+        name: Before script 
+        run: |
+          python -V
+          pip install virtualenv
+          virtualenv venv
+          . venv/bin/activate
+
+      - name: Install deps and run tests (3.10)
+        run: |
+          pip install -e .[test]
+          pytest tests/ --maxfail=1 --disable-warnings -v --cov=src --cov-report=xml:coverage/${{ env.TOXENV }}/coverage.xml --junitxml=report/${{ env.TOXENV }}/report.xml
+
+      - &test-report
+        name: Archive report 
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit.xml-${{ env.TOXENV }}
+          path: report/${{ env.TOXENV }}/report.xml
+          
+      - &test-coverage
+        name: Archive coverage 
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage.xml-${{ env.TOXENV }}
+          path: coverage/${{ env.TOXENV }}/coverage.xml
+
+      - &coverage-text
+        name: Generate coverage text
+        run: |
+          coverage report -m > coverage/$TOXENV/coverage.txt
+          
+      - &check-test-coverage
+        name: Check coverage threshold
+        run: |
+          if ! grep -Ei "TOTAL.* ([1-9]?[0-9]|100)%" coverage/$TOXENV/coverage.txt; then
+            echo "Coverage threshold not met"
+            exit 1
+          fi
+
+  test-py311:
+    runs-on: ubuntu-22.04
+    container: python:3.11
+    env: 
+      TOXENV: py311  
+    steps:
+      - uses: actions/checkout@v4
+      - *cache-pip
+      - *before-script
+      - name: Install deps and run tests (3.11)
+        run: |
+          pip install -e .[test]
+          pytest tests/ --maxfail=1 --disable-warnings -v --cov=src --cov-report=xml:coverage/${{ env.TOXENV }}/coverage.xml --junitxml=report/${{ env.TOXENV }}/report.xml
+      - *test-report
+      - *test-coverage
+      - *coverage-text
+      - *check-test-coverage
+
+  test-py313:
+    runs-on: ubuntu-22.04
+    container: python:3.13
+    env: 
+      TOXENV: py313  
+    steps:
+      - uses: actions/checkout@v4
+      - *cache-pip
+      - *before-script
+      - name: Install deps and run tests (3.13)
+        run: |
+          pip install -e .[test]
+          pytest tests/ --maxfail=1 --disable-warnings -v --cov=src --cov-report=xml:coverage/${{ env.TOXENV }}/coverage.xml --junitxml=report/${{ env.TOXENV }}/report.xml
+      - *test-report
+      - *test-coverage
+      - *coverage-text
+      - *check-test-coverage
+
+  formatting-check:
+    runs-on: ubuntu-22.04
+    container: python:3.10
+    steps:
+      - uses: actions/checkout@v4
+      - *cache-pip
+      - *before-script
+      - name: Check code formatting
+        run: | 
+          pip install .[test]
+          black --check src/ tests/
+
+  build-job:
+    container: python:3.13
+    needs: [test-py310, test-py311, test-py313, formatting-check]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    env:
+      CI_JOB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      CI_API_V4_URL: https://upload.pypi.org/legacy/
+      CI_PROJECT_ID: ${{github.repository}}
+    steps:
+      - uses: actions/checkout@v4
+      - *cache-pip
+      - *before-script
+      - name: Build and publish package
+        run: |
+          pip install .[build]
+          python -m build
+          TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }} TWINE_USERNAME=__token__ python -m twine upload dist/*
