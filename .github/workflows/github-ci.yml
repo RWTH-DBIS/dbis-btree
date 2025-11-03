@@ -2,9 +2,7 @@ name: CI Pipeline (Optimized)
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  # Triggers any branch
   workflow_dispatch:
 
 jobs:
