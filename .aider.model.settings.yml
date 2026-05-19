@@ -1,0 +1,2 @@
+- name: openai/gpt-5.4-mini
+  edit_format: whole
