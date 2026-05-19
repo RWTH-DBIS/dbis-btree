@@ -1,8 +1,10 @@
 name: AI-Assisted CI
 
 on:
+  push:
+    branches: [main, GitHub]
   pull_request:
-    branches: [main]
+    branches: [main, GitHub]
 
 jobs:
   # ── Job 1: Auto-fix failing tests ─────────────────────────────────────────
