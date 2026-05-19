@@ -73,7 +73,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install aider-chat gh
+        run: pip install aider-chat
 
       - name: Get PR diff
         run: |
@@ -93,10 +93,13 @@ jobs:
                 2>&1 | tee review_output.txt
 
       - name: Post review as PR comment
+        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} \
-            --body "## 🤖 AI Code Review
-
-          $(cat review_output.txt)"
+          {
+            echo "## 🤖 AI Code Review"
+            echo ""
+            cat review_output.txt
+          } > review_comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file review_comment.md
