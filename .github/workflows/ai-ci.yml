@@ -25,11 +25,13 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install aider-chat pytest
+        run: |
+          pip install aider-chat pytest
+          pip install -e .
 
       - name: Run tests
         id: tests
-        run: pytest test_btree.py -v 2>&1 | tee test_output.txt
+        run: pytest tests/test_btree.py -v 2>&1 | tee test_output.txt
         continue-on-error: true
 
       - name: AI fix on failure
@@ -38,14 +40,14 @@ jobs:
           OPENAI_API_BASE: ${{ secrets.LLM_API_BASE }}
           OPENAI_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: |
-          aider --model openai/your-model-name \
-                --message "The following tests are failing. Fix the bugs in BBaum.py so all tests pass. Do not modify test_btree.py. Test output:\n$(cat test_output.txt)" \
+          aider --model openai/gpt-5.4-mini \
+                --message "The following tests are failing. Fix the bugs in src/dbis_btree/BBaum.py so all tests pass. Do not modify tests/test_btree.py. Test output:\n$(cat test_output.txt)" \
                 --yes \
-                BBaum.py test_btree.py
+                src/dbis_btree/BBaum.py tests/test_btree.py
 
       - name: Verify fix
         if: steps.tests.outcome == 'failure'
-        run: pytest test_btree.py -v
+        run: pytest tests/test_btree.py -v
 
       - name: Push AI fixes
         if: steps.tests.outcome == 'failure'
@@ -85,11 +87,11 @@ jobs:
           OPENAI_API_BASE: ${{ secrets.LLM_API_BASE }}
           OPENAI_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: |
-          aider --model openai/your-model-name \
+          aider --model openai/gpt-5.4-mini \
                 --message "Review this pull request diff for bugs, correctness issues, and code quality. Be concise. Format your response as a markdown list. Diff:\n$(cat pr_diff.txt)" \
                 --yes \
                 --no-auto-commits \
-                BBaum.py test_btree.py \
+                src/dbis_btree/BBaum.py tests/test_btree.py \
                 2>&1 | tee review_output.txt
 
       - name: Post review as PR comment
