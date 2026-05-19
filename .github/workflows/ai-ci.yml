@@ -2,7 +2,7 @@ name: AI-Assisted CI
 
 on:
   pull_request:
-    branches: AIder
+    branches: [main]
 
 jobs:
   # ── Job 1: Auto-fix failing tests ─────────────────────────────────────────
