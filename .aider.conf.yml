@@ -1,0 +1,4 @@
+auto-commits: true
+yes-always: true
+attribute-author: true
+attribute-commit-message-author: true

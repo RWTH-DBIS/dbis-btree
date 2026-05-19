@@ -1,0 +1,105 @@
+name: AI-Assisted CI
+
+on:
+  push:
+    branches: [main, GitHub]
+  pull_request:
+    branches: [main, GitHub]
+
+jobs:
+  # ── Job 1: Auto-fix failing tests ─────────────────────────────────────────
+  test-and-fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install aider-chat pytest
+
+      - name: Run tests
+        id: tests
+        run: pytest test_btree.py -v 2>&1 | tee test_output.txt
+        continue-on-error: true
+
+      - name: AI fix on failure
+        if: steps.tests.outcome == 'failure'
+        env:
+          OPENAI_API_BASE: ${{ secrets.LLM_API_BASE }}
+          OPENAI_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: |
+          aider --model openai/your-model-name \
+                --message "The following tests are failing. Fix the bugs in BBaum.py so all tests pass. Do not modify test_btree.py. Test output:\n$(cat test_output.txt)" \
+                --yes \
+                BBaum.py test_btree.py
+
+      - name: Verify fix
+        if: steps.tests.outcome == 'failure'
+        run: pytest test_btree.py -v
+
+      - name: Push AI fixes
+        if: steps.tests.outcome == 'failure'
+        run: |
+          git config user.name "aider-bot"
+          git config user.email "aider@ci"
+          git add -A
+          git diff --cached --quiet || git commit -m "ci(aider): auto-fix failing tests"
+          git push
+
+  # ── Job 2: Code review on PRs ─────────────────────────────────────────────
+  ai-review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install aider-chat
+
+      - name: Get PR diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD -- '*.py' > pr_diff.txt
+          cat pr_diff.txt
+
+      - name: AI review
+        env:
+          OPENAI_API_BASE: ${{ secrets.LLM_API_BASE }}
+          OPENAI_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: |
+          aider --model openai/your-model-name \
+                --message "Review this pull request diff for bugs, correctness issues, and code quality. Be concise. Format your response as a markdown list. Diff:\n$(cat pr_diff.txt)" \
+                --yes \
+                --no-auto-commits \
+                BBaum.py test_btree.py \
+                2>&1 | tee review_output.txt
+
+      - name: Post review as PR comment
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## 🤖 AI Code Review"
+            echo ""
+            cat review_output.txt
+          } > review_comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file review_comment.md
